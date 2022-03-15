@@ -1,0 +1,50 @@
+﻿<Window x:Class="Acheron.Tests.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Acheron.Tests.WPF"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Title="MainWindow"
+        Width="1000"
+        Height="450"
+        Background="#121212"
+        Foreground="#b1b1b1"
+        WindowState="Maximized"
+        mc:Ignorable="d">
+    <Grid>
+        <ScrollViewer x:Name="scrollViewer"
+                      Margin="25"
+                      Background="#121212"
+                      BorderBrush="#2f4657"
+                      FontFamily="Calibri"
+                      FontSize="16"
+                      HorizontalScrollBarVisibility="Disabled"
+                      TextBlock.LineHeight="6"
+                      VerticalScrollBarVisibility="Auto"
+                      Visibility="Visible" />
+
+        <Button Height="25"
+                Padding="15,0"
+                VerticalAlignment="Bottom"
+                Click="Button_Click"
+                Content="Next"
+                Visibility="Visible" />
+
+        <TextBlock Margin="15"
+                   VerticalAlignment="Center"
+                   FontSize="25"
+                   Visibility="Visible">
+            <Border>
+                <TextBlock FontSize="28" Text="Header 1" />
+            </Border>
+            <LineBreak />
+            <Border Padding="10,0,10,2.5"
+                    Background="#3f2f2f2f"
+                    BorderBrush="#2f2f2f"
+                    BorderThickness="5,0,0,0"
+                    CornerRadius="2.5">
+                <TextBlock FontSize="16" Text="Quote" />
+            </Border>
+        </TextBlock>
+    </Grid>
+</Window>
