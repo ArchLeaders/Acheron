@@ -7,187 +7,13 @@ namespace System.Text.Formatting
 {
     public static class Convert
     {
-        /// <summary>
-        /// Converts a markdown formatted string to a WPF renderable text block.
-        /// </summary>
-        /// <remarks>
-        /// Currently supports bold <c>(*)</c>, underline <c>(_)</c>, and italic <c>(~)</c>
-        /// </remarks>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        public static TextBlock ToTextBlock(this string text)
+        public static TextBlock ToTextBlock(this string text, string fontFamily = "Calibri", double body = 16, double h1 = 28, double h2 = 24, double h3 = 20,
+            string quoteBackground = "", string quoteBorder = "#2f2f2f", string codeBackground = "#1f1f1f", bool noWrap = false)
         {
-            TextBlock textBlock = new() { TextWrapping = TextWrapping.WrapWithOverflow };
-
-            string span = "";
-            string hrefSpan = "";
-            string href = "";
-            string run = "";
-
-            bool inHrefSpan = false;
-            bool isEndHrefSpan = false;
-            bool inHref = false;
-            bool isEscaped = false;
-
-            bool bold = false;
-            bool italic = false;
-            bool underline = false;
-            bool strikethrough = false;
-
-            foreach (char _char in text)
+            TextBlock textBlock = new()
             {
-                // Escape
-
-                if (_char == '\\')
-                {
-                    isEscaped = true;
-                }
-
-                else if (isEscaped)
-                {
-                    span = $"{span}{_char}";
-                    isEscaped = false;
-                }
-
-                // Bold
-                else if (_char == '*')
-                {
-                    if (run == "")
-                    {
-                        UpdateBool(ref italic);
-                    }
-                    else if (run == "*")
-                    {
-                        UpdateBool(ref italic);
-                        UpdateBool(ref bold);
-                    }
-                    else if (run == "**")
-                    {
-                        UpdateBool(ref bold);
-                        UpdateBool(ref italic);
-                    }
-
-                    run = $"{run}{_char}";
-                }
-
-                // Strikethrough
-                else if (_char == '~')
-                {
-                    if (run == "~")
-                    {
-                        UpdateBool(ref strikethrough);
-                    }
-
-                    run = $"{run}{_char}";
-                }
-
-                // Underline
-                else if (_char == '_')
-                {
-                    if (run == "")
-                    {
-                        UpdateBool(ref italic);
-                    }
-                    else if (run == "_")
-                    {
-                        UpdateBool(ref underline);
-                    }
-
-                    run = $"{run}{_char}";
-                }
-
-                // Hyperlink
-
-                else if (_char == '[' && !inHrefSpan)
-                {
-                    textBlock.Inlines.Add(GetRun(span));
-                    span = "";
-                    inHrefSpan = true;
-                }
-
-                else if (_char == ']' && inHrefSpan)
-                {
-                    inHrefSpan = false;
-                    isEndHrefSpan = true;
-                }
-
-                else if (_char == '(' && isEndHrefSpan)
-                {
-                    inHref = true;
-                    isEndHrefSpan = false;
-                }
-
-                else if (_char != '(' && isEndHrefSpan)
-                {
-                    isEndHrefSpan = false;
-                    textBlock.Inlines.Add($"[{hrefSpan}]{_char}");
-                    hrefSpan = "";
-                }
-
-                else if (_char == ')' && inHref)
-                {
-                    inHref = false;
-
-                    Hyperlink hyperlink = new() { NavigateUri = new(href) };
-                    hyperlink.RequestNavigate += Actions.OpenURL;
-
-                    hyperlink.Inlines.Add(GetRun(hrefSpan));
-                    textBlock.Inlines.Add(hyperlink);
-
-                    hrefSpan = ""; href = "";
-                }
-
-                else if (inHrefSpan)
-                {
-                    hrefSpan = $"{hrefSpan}{_char}";
-                }
-
-                else if (inHref)
-                {
-                    href = $"{href}{_char}";
-                }
-
-                else
-                {
-                    span = $"{span}{_char}";
-                    run = "";
-                }
-            }
-
-            textBlock.Inlines.Add(GetRun(span));
-            textBlock.Inlines.Add(GetRun(hrefSpan));
-
-            return textBlock;
-
-            void UpdateBool(ref bool value)
-            {
-                textBlock.Inlines.Add(GetRun(span));
-                value = !value;
-                span = "";
-            }
-
-            Run GetRun(string text)
-            {
-                Run run = new(text)
-                {
-                    FontWeight = bold ? FontWeights.Bold : FontWeights.Normal,
-                    FontStyle = italic ? FontStyles.Italic : FontStyles.Normal
-                };
-
-                if (underline)
-                    run.TextDecorations.Add(TextDecorations.Underline);
-
-                if (strikethrough)
-                    run.TextDecorations.Add(TextDecorations.Strikethrough);
-
-                return run;
-            }
-        }
-
-        public static TextBlock ToTextBlockBold(this string text, string fontFamily = "Calibri", double body = 16, double h1 = 28, double h2 = 24, double h3 = 20,
-            string quoteBackground = "", string quoteBorder = "", string codeBackground = "")
-        {
-            TextBlock textBlock = new();
+                TextWrapping = TextWrapping.WrapWithOverflow,
+            };
 
             // Text span
             string span = "";
@@ -252,7 +78,7 @@ namespace System.Text.Formatting
 
                 // Handle headers
 
-                else if (_char == '#')
+                else if (_char == '#' && last == '\n')
                 {
                     headerCharSpan++;
 
@@ -429,6 +255,7 @@ namespace System.Text.Formatting
                 TextBlock child = new() // Create a new Run class
                 {
                     Text = span,
+                    TextWrapping = noWrap ? TextWrapping.NoWrap : TextWrapping.WrapWithOverflow,
                     FontWeight = bold ? FontWeights.Bold : isHeaderThree ? FontWeights.ExtraBold : isHeaderTwo ? FontWeights.ExtraLight : FontWeights.Normal,
                     FontStyle = italic ? FontStyles.Italic : FontStyles.Normal,
                     FontFamily = inline ? new("Consolas") : new(fontFamily),
