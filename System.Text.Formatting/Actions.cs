@@ -10,7 +10,7 @@ using System.Windows.Navigation;
 
 namespace System.Text.Formatting
 {
-    internal class Actions
+    public class Actions
     {
         public static void OpenURL(object sender, RequestNavigateEventArgs e) => _ = Execute.Url(((Hyperlink)sender).NavigateUri);
     }
